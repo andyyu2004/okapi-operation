@@ -51,7 +51,7 @@ impl Header {
 /// Wrapper, implementing [`ToTokens`] for [`Parameter`].
 pub(super) struct ParameterHeader<'a>(pub(super) &'a Header);
 
-impl<'a> ToTokens for ParameterHeader<'a> {
+impl ToTokens for ParameterHeader<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.0.name;
         let description = quote_option(&self.0.description);
@@ -77,7 +77,7 @@ impl<'a> ToTokens for ParameterHeader<'a> {
 /// Wrapper, implementing [`ToTokens`] for [`Header`].
 pub(super) struct ResponseHeader<'a>(pub(super) &'a Header);
 
-impl<'a> ToTokens for ResponseHeader<'a> {
+impl ToTokens for ResponseHeader<'_> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let description = quote_option(&self.0.description);
         let required = &self.0.required;
@@ -93,5 +93,18 @@ impl<'a> ToTokens for ResponseHeader<'a> {
                 extensions: Default::default(),
             }
         });
+    }
+
+    fn to_token_stream(&self) -> TokenStream {
+        let mut tokens = TokenStream::new();
+        self.to_tokens(&mut tokens);
+        tokens
+    }
+
+    fn into_token_stream(self) -> TokenStream
+    where
+        Self: Sized,
+    {
+        self.to_token_stream()
     }
 }
